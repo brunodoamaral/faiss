@@ -73,18 +73,18 @@ HFILES = IndexFlat.h Index.h IndexLSH.h IndexPQ.h IndexIVF.h \
     PolysemousTraining.h Heap.h MetaIndexes.h AuxIndexStructures.h \
     Clustering.h hamming.h AutoTune.h
 
-# also silently generates python/swigfaiss.py
-python/swigfaiss_wrap.cxx: swigfaiss.swig $(HFILES)
+# also silently generates python/faiss/swigfaiss.py
+python/faiss/swigfaiss_wrap.cxx: swigfaiss.swig $(HFILES)
 	$(SWIGEXEC) -python -c++ -Doverride= -o $@ $<
 
 
 # extension is .so even on the mac
-python/_swigfaiss.so: python/swigfaiss_wrap.cxx $(LIBNAME).a
+python/faiss/_swigfaiss.so: python/faiss/swigfaiss_wrap.cxx $(LIBNAME).a
 	$(CC) -I. $(CFLAGS) $(LDFLAGS) $(PYTHONCFLAGS) $(SHAREDFLAGS) \
 	-o $@ $^ $(BLASLDFLAGSSO)
 
-_swigfaiss.so: python/_swigfaiss.so
-	cp python/_swigfaiss.so python/swigfaiss.py .
+_swigfaiss.so: python/faiss/_swigfaiss.so
+	cp python/faiss/_swigfaiss.so python/faiss/swigfaiss.py .
 
 #############################
 # Dependencies
@@ -134,8 +134,8 @@ VectorTransform.o: VectorTransform.cpp VectorTransform.h Index.h utils.h \
 clean:
 	rm -f $(LIBNAME).a $(LIBNAME).$(SHAREDEXT)* *.o \
 	   	lua/swigfaiss.so lua/swigfaiss_wrap.cxx \
-		python/_swigfaiss.so python/swigfaiss_wrap.cxx \
-		python/swigfaiss.py _swigfaiss.so swigfaiss.py
+		python/faiss/_swigfaiss.so python/faiss/swigfaiss_wrap.cxx \
+		python/faiss/swigfaiss.py _swigfaiss.so swigfaiss.py
 
 .env_ok:
 ifeq ($(wildcard $(MAKEFILE_INC)),)
